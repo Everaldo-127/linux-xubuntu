@@ -378,6 +378,8 @@ ui_menu() {
     ui_separador_tabela
     ui_linha_tabela "11" "Reboot do Sistema" "Reiniciar o sistema para aplicar o ambiente" ""
     ui_separador_tabela
+    ui_linha_tabela "12" "Documentação" "Abrir manual PDF em uma nova janela" ""
+    ui_separador_tabela
     ui_linha_tabela "0" "Sair" "Encerrar o programa sem alterar nada" ""
     ui_base_tabela
     ui_linha_cheia
@@ -726,6 +728,44 @@ executar_reboot() {
     if [ -e /var/lib/muda-ambientes/reboot-bloqueado ]; then echo '[ERRO] Instalação incompleta. Reboot bloqueado.'; return 1; fi
     sync && reboot
 }
+# Abre o manual no navegador do usuario original (fora da sessao root).
+abrir_documentacao() {
+    local url='https://github.com/Everaldo-127/linux-xubuntu/blob/main/Documenta%C3%A7%C3%A3o/MUDA-AMB_Manual_Atualizado.pdf'
+    local usuario="${SUDO_USER:-}" uid="" ambiente="" endereco=""
+    local -a abrir=()
+
+    if command -v xdg-open >/dev/null 2>&1; then
+        abrir=(xdg-open "$url")
+    elif command -v gio >/dev/null 2>&1; then
+        abrir=(gio open "$url")
+    else
+        echo '[ERRO] Nenhum abridor de links instalado (xdg-open ou gio).'
+        return 1
+    fi
+
+    if [ -n "$usuario" ] && [ "$usuario" != root ] && command -v runuser >/dev/null 2>&1; then
+        uid="$(id -u "$usuario" 2>/dev/null)" || return 1
+        ambiente="${XDG_RUNTIME_DIR:-/run/user/$uid}"
+        [ -d "$ambiente" ] || ambiente="/run/user/$uid"
+        endereco="${DBUS_SESSION_BUS_ADDRESS:-}"
+        [ -n "$endereco" ] || endereco="unix:path=$ambiente/bus"
+        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            runuser -u "$usuario" -- env DISPLAY="${DISPLAY:-}" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-}" XDG_RUNTIME_DIR="$ambiente" DBUS_SESSION_BUS_ADDRESS="$endereco" "${abrir[@]}" >/dev/null 2>&1 &
+        else
+            echo '[ERRO] Sessão gráfica do usuário não identificada.'
+            return 1
+        fi
+    else
+        if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ]; then
+            echo '[ERRO] Sessão gráfica não identificada.'
+            return 1
+        fi
+        "${abrir[@]}" >/dev/null 2>&1 &
+    fi
+    echo '[DOCUMENTAÇÃO] Solicitação de abertura enviada ao navegador.'
+    return 0
+}
+
 # ==============================================================================
 # MENU PRINCIPAL
 # ==============================================================================
@@ -739,7 +779,7 @@ while true; do
     ui_menu
 
     printf '\n' >&3
-    printf "Selecione a opção desejada [0-11]: " >&3
+    printf "Selecione a opção desejada [0-12]: " >&3
     read -r opcao || exit 0
 
     case "$opcao" in
@@ -798,12 +838,15 @@ while true; do
             ui_resumo_execucao
             ui_voltar_menus
             ;;
+        12)
+            abrir_documentacao
+            ;;
         0)
             echo "[ENCERRANDO] Até logo!"
             exit 0
             ;;
         *)
-            echo "[ERRO] Opção inválida! Digite um número entre 0 e 11."
+            echo "[ERRO] Opção inválida! Digite um número entre 0 e 12."
             ;;
     esac
 done
