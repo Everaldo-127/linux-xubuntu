@@ -1295,7 +1295,7 @@ print_banner() {
   _banner_line "" ""
   if [ "$_use_color" = "1" ]; then printf '%s%s%s\n' "${BOLD}${C_TITLE}" "$_bw_line" "${RESET}"; else printf '%s\n' "$_bw_line"; fi
 }
-INVENTORY_DOC_URL='https://github.com/Everaldo-127/linux-xubuntu/blob/main/Documenta%C3%A7%C3%A3o/Manual_Inventorytaker.pdf'
+INVENTORY_DOC_URL='https://github.com/Everaldo-127/linux-xubuntu/blob/main/Documenta%C3%A7%C3%A3o/INVENTORYTAKER_Desktop_manual.pdf'
 open_inventory_documentation() {
   local _op _pid _i _user _uid _home _runtime _auth _display _wayland _desktop _desktop_path _dir
   local -a _as _env _apps _args
@@ -2835,7 +2835,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND = os.path.join(APP_DIR, "LINUX_InventoryTaker.sh")
 ICON = os.path.join(APP_DIR, "inventorytaker.svg")
 DOC_URL = ("https://github.com/Everaldo-127/linux-xubuntu/blob/main/"
-           "Documenta%C3%A7%C3%A3o/Manual_Inventorytaker.pdf")
+           "Documenta%C3%A7%C3%A3o/INVENTORYTAKER_Desktop_manual.pdf")
 REPORT_DIR = os.path.join(os.path.expanduser("~"), "Área de trabalho", "INVENTÁRIO")
 
 # (chave no JSON, título exibido)
