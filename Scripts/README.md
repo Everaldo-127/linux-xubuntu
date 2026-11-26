@@ -1,5 +1,3 @@
-UBUNTU 24.04 LTS - Scripts para Personalização, Automação e Gerenciamento . Xubuntu 24.04 LTS (Noble Numbat)
-
 *****************************
 ********* PROGRAMAS *********
 *****************************
